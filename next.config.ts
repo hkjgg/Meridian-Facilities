@@ -4,12 +4,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   images: {
-    // All artwork in this project ships as SVG. Next's optimizer refuses SVG
-    // unless explicitly allowed, so we allow it behind a locked-down CSP that
-    // prevents any script from executing inside a served image.
-    dangerouslyAllowSVG: true,
-    contentDispositionType: "attachment",
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Artwork currently ships as SVG, which is served straight from /public via
+    // the `unoptimized` flag on <Artwork> — there is nothing for the optimizer
+    // to re-encode, and skipping it means we never have to enable
+    // dangerouslyAllowSVG. These formats apply to raster photography when it
+    // replaces the illustrations.
     formats: ["image/avif", "image/webp"],
   },
   async headers() {

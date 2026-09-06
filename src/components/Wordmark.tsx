@@ -16,7 +16,6 @@ export function Wordmark({
     <Link
       href={href}
       className={`group inline-flex items-center gap-2.5 ${className}`}
-      aria-label="Meridian Facilities — home"
     >
       <svg
         viewBox="0 0 32 32"
@@ -45,6 +44,10 @@ export function Wordmark({
         Meridian
         <span className="text-ink-500 [.on-dark_&]:text-ink-300"> Facilities</span>
       </span>
+      {/* The accessible name is built from content rather than an aria-label,
+          so it always contains the visible text — speech-input users can say
+          "Meridian Facilities" and activate the link (WCAG 2.5.3). */}
+      <span className="sr-only">home</span>
     </Link>
   );
 }

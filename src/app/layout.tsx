@@ -19,11 +19,13 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+// Only the weight axis is requested. Fraunces also ships SOFT, WONK and opsz,
+// and pulling them in tripled the preloaded font file for axes this design
+// never varies.
 const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-fraunces",
-  axes: ["SOFT", "WONK", "opsz"],
 });
 
 export const metadata: Metadata = {
