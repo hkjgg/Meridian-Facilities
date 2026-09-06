@@ -27,9 +27,19 @@ npm run dev                  # http://localhost:3000
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Origin used for canonical URLs, `sitemap.xml`, `robots.txt` and Open Graph tags. Defaults to `https://meridianfacilities.com`. |
+| `NEXT_PUBLIC_SITE_URL` | Optional | Origin used for canonical URLs, `sitemap.xml`, `robots.txt` and Open Graph tags. Falls back to `https://meridianfacilities.com`. |
 | `SUPABASE_URL` | For forms | Supabase project URL. |
 | `SUPABASE_SERVICE_ROLE_KEY` | For forms | Service role key. Server-side only — it deliberately has no `NEXT_PUBLIC_` prefix and must never reach the browser. |
+
+**The build never depends on the environment.** `npm run build` succeeds with no
+variables set at all. `NEXT_PUBLIC_SITE_URL` is resolved through a single
+normaliser in `src/lib/site.ts`: a blank, whitespace-only, non-http or malformed
+value falls back to the default origin instead of throwing, a bare hostname
+gains `https://`, and any trailing slash, query or fragment is stripped so
+`${site.url}/services` can never produce a doubled slash. This matters because
+hosts do not always leave an unset variable undefined — Vercel supplies an empty
+string for a variable that is declared but has no value, and `??` does not catch
+that.
 
 **If the two Supabase variables are missing, both form endpoints return HTTP 503**
 and the UI tells the visitor to call instead. This is deliberate: a form that
@@ -129,6 +139,11 @@ Measured against a production build (`next build && next start`) in Chromium:
   against the columns in `supabase/schema.sql`.
 - **Degradation** — with JavaScript disabled and with
   `prefers-reduced-motion: reduce`, no revealed content stays hidden.
+- **Environment independence** — production builds pass with the app variables
+  unset and with `NEXT_PUBLIC_SITE_URL` set to `""`, whitespace, a bare
+  hostname, a trailing slash, `ftp://`, and free text. With nothing set, the
+  canonical tags, `sitemap.xml`, `robots.txt` and JSON-LD all emit the fallback
+  origin, and the forms still answer 503.
 
 `npm audit` reports advisories in the `postcss` copy nested inside `next`. It is
 a build-time dependency and the only fix available is Next.js 16, which would

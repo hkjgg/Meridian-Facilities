@@ -29,6 +29,8 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
+  // site.url is normalised in src/lib/site.ts and is always a valid absolute
+  // http(s) origin, so this cannot throw even with no environment set.
   metadataBase: new URL(site.url),
   title: {
     default: `${site.name} — ${site.tagline} in ${site.address.city}`,

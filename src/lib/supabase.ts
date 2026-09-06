@@ -11,17 +11,40 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 let client: SupabaseClient | null = null;
 
+/**
+ * Reads a credential, treating blank values as absent.
+ *
+ * A host can supply an empty string for a variable that is declared but unset,
+ * and a copy-pasted value can arrive surrounded by whitespace. Neither is a
+ * configured credential.
+ */
+function credential(name: "SUPABASE_URL" | "SUPABASE_SERVICE_ROLE_KEY") {
+  const value = process.env[name]?.trim();
+  return value ? value : undefined;
+}
+
 export function isSupabaseConfigured(): boolean {
-  return Boolean(
-    process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY,
-  );
+  const url = credential("SUPABASE_URL");
+  if (!url || !credential("SUPABASE_SERVICE_ROLE_KEY")) return false;
+
+  // A malformed URL would throw inside createClient. Report it as unconfigured
+  // so the route answers with its 503 instead of a 500.
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    console.error(
+      `[meridian] SUPABASE_URL is not a valid URL (${JSON.stringify(url)}).`,
+    );
+    return false;
+  }
 }
 
 export function getSupabase(): SupabaseClient {
   if (client) return client;
 
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = credential("SUPABASE_URL");
+  const key = credential("SUPABASE_SERVICE_ROLE_KEY");
 
   if (!url || !key) {
     throw new Error(
