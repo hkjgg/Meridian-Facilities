@@ -62,6 +62,7 @@ export function SectionHeading({
   lede,
   align = "left",
   as: Tag = "h2",
+  id,
   className = "",
 }: {
   eyebrow?: string;
@@ -69,6 +70,7 @@ export function SectionHeading({
   lede?: ReactNode;
   align?: "left" | "center";
   as?: "h1" | "h2" | "h3";
+  id?: string;
   className?: string;
 }) {
   return (
@@ -76,7 +78,9 @@ export function SectionHeading({
       className={`${align === "center" ? "mx-auto max-w-2xl text-center" : "max-w-2xl"} ${className}`}
     >
       {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-      <Tag className={`text-headline ${eyebrow ? "mt-5" : ""}`}>{title}</Tag>
+      <Tag id={id} className={`text-headline ${eyebrow ? "mt-5" : ""}`}>
+        {title}
+      </Tag>
       {lede ? (
         <p className="mt-5 text-lede text-ink-500 [.on-dark_&]:text-ink-300">
           {lede}
