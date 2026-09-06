@@ -17,6 +17,7 @@ export function Artwork({
   height,
   sizes,
   priority = false,
+  loading,
   className = "",
 }: {
   src: string;
@@ -24,7 +25,14 @@ export function Artwork({
   width: number;
   height: number;
   sizes: string;
+  /** Emits a preload link. Reserve it for an image that is genuinely the LCP. */
   priority?: boolean;
+  /**
+   * "eager" loads immediately without a preload link — the right setting for a
+   * hero that is in view on desktop but sits below the fold on mobile, where
+   * preloading it would compete with the text that actually is the LCP.
+   */
+  loading?: "eager" | "lazy";
   className?: string;
 }) {
   return (
@@ -35,6 +43,7 @@ export function Artwork({
       height={height}
       sizes={sizes}
       priority={priority}
+      loading={loading}
       unoptimized={src.endsWith(".svg")}
       className={className}
     />

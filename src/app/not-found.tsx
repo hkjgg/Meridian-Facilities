@@ -31,7 +31,7 @@ export default function NotFound() {
         </ButtonLink>
       </div>
 
-      <nav aria-label="Services" className="mt-16 border-t border-ink-900/12 pt-8">
+      <nav aria-label="Popular services" className="mt-16 border-t border-ink-900/12 pt-8">
         <h2 className="text-sm font-semibold tracking-[0.14em] text-ink-500 uppercase">
           Services
         </h2>

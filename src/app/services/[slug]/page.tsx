@@ -113,7 +113,7 @@ export default async function ServicePage({ params }: Props) {
                 alt={service.imageAlt}
                 width={1000}
                 height={750}
-                priority
+                loading="eager"
                 sizes="(min-width: 1024px) 46vw, 100vw"
                 className="h-auto w-full"
               />

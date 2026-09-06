@@ -149,7 +149,7 @@ export default function AboutPage() {
             alt="Illustration of a city block at night with lit windows across five commercial buildings, marking the overnight service shift"
             width={1000}
             height={750}
-            priority
+            loading="eager"
             sizes="(min-width: 1024px) 72rem, 100vw"
             className="h-auto w-full"
           />

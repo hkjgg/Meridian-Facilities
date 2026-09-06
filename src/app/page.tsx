@@ -91,7 +91,7 @@ export default function HomePage() {
                 alt="Floorplan of an office building with cleaning zones marked and an overnight service route threaded through the corridors"
                 width={1200}
                 height={900}
-                priority
+                loading="eager"
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 className="h-auto w-full"
               />
