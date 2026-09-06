@@ -19,6 +19,12 @@ export const metadata: Metadata = {
     description:
       "Nightly janitorial, floor care, disinfection and building maintenance for offices and retail across greater Portland.",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} — ${site.tagline}`,
+    description:
+      "Nightly janitorial, floor care, disinfection and building maintenance for offices and retail across greater Portland.",
+  },
 };
 
 const differentiators = [
