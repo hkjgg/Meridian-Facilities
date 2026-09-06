@@ -116,12 +116,14 @@ credentials all need real values.
 
 Measured against a production build (`next build && next start`) in Chromium:
 
-- **Lighthouse** — 98 performance / 100 accessibility / 100 best practices /
+- **Lighthouse** — 97-99 performance / 100 accessibility / 100 best practices /
   100 SEO on all six page types, CLS 0 across the board.
   Reproduce with `npx lighthouse http://localhost:3000/ --only-categories=performance,accessibility,best-practices,seo`.
-- **axe-core** — zero violations on every page at 1440px and 390px, including
-  the open mobile menu, against `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa` and
-  best-practice rules.
+- **axe-core** — zero violations across seven pages at 1440px and 390px,
+  including the open mobile menu, against `wcag2a`, `wcag2aa`, `wcag21a`,
+  `wcag21aa` and best-practice rules.
+- **Mobile menu** — focus moves into the panel on open, Tab cycles within it,
+  and Escape closes it and returns focus to the toggle.
 - **Forms** — the full four-step quote flow and the contact form, including
   per-step validation, keyboard-only operation, and insert payloads checked
   against the columns in `supabase/schema.sql`.

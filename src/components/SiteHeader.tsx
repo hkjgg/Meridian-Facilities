@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { nav, site } from "@/lib/site";
 import { Wordmark } from "./Wordmark";
 import { buttonClass } from "./ui";
@@ -10,6 +10,15 @@ import { buttonClass } from "./ui";
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+
+  const close = useCallback(() => {
+    setOpen(false);
+    // Return focus to the control that opened the panel, so the keyboard user
+    // resumes where they left off rather than at the top of the document.
+    toggleRef.current?.focus();
+  }, []);
 
   // Close the mobile panel whenever the route changes, otherwise it stays
   // open over the new page after a navigation.
@@ -17,28 +26,61 @@ export function SiteHeader() {
     setOpen(false);
   }, [pathname]);
 
-  // Lock background scrolling while the panel covers the viewport.
+  // While the panel covers the viewport: lock background scrolling, close on
+  // Escape, and keep Tab inside the panel. Without the trap, tabbing walks into
+  // page content sitting behind an opaque overlay — visible to the focus ring,
+  // invisible to the user.
   useEffect(() => {
     if (!open) return;
+
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
+    const focusable = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>("a[href], button") ?? [],
+      );
+
+    focusable()[0]?.focus();
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        close();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const items = focusable();
+      if (items.length === 0) return;
+
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || !panelRef.current?.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
+
     document.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = previous;
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [open, close]);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-ink-900/8 bg-paper-100/85 backdrop-blur-md">
+    <>
+      <header className="sticky top-0 z-50 border-b border-ink-900/8 bg-paper-100/85 backdrop-blur-md">
       <div className="shell flex h-18 items-center justify-between gap-6 py-4">
         <Wordmark />
 
@@ -76,6 +118,7 @@ export function SiteHeader() {
         </div>
 
         <button
+          ref={toggleRef}
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
@@ -103,12 +146,20 @@ export function SiteHeader() {
         </button>
       </div>
 
+      </header>
+
+      {/* Rendered as a sibling of <header>, not inside it. The header's
+          backdrop-blur establishes a containing block for fixed-position
+          descendants, which would pin this panel to the header's own 72px box
+          instead of the viewport. */}
       {open ? (
-        <div
+        <nav
+          ref={panelRef}
           id="mobile-nav"
+          aria-label="Primary mobile"
           className="fixed inset-x-0 top-18 bottom-0 z-40 overflow-y-auto border-t border-ink-900/8 bg-paper-100 px-6 pt-8 pb-12 md:hidden"
         >
-          <nav aria-label="Primary mobile" className="flex flex-col">
+          <div className="flex flex-col">
             {nav.map((item) => (
               <Link
                 key={item.href}
@@ -119,7 +170,7 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-          </nav>
+          </div>
           <Link
             href="/quote"
             className={`${buttonClass("primary", "lg")} mt-8 w-full`}
@@ -132,8 +183,8 @@ export function SiteHeader() {
           >
             {site.phoneDisplay}
           </a>
-        </div>
+        </nav>
       ) : null}
-    </header>
+    </>
   );
 }
