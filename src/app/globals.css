@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Design tokens.
+   Palette is deliberately narrow: one deep navy, one warm white, one copper
+   accent. Every value below was contrast-checked against the surface it is
+   used on, so no combination in the UI falls under WCAG AA.
+--------------------------------------------------------------------------- */
+@theme {
+  /* Navy — primary dark surface and body copy on light backgrounds. */
+  --color-ink-950: #08111d;
+  --color-ink-900: #101e33;
+  --color-ink-800: #1b2c45;
+  --color-ink-700: #2a3d59;
+  --color-ink-500: #5a6472;
+  --color-ink-300: #c3ccd9;
+
+  /* Warm white — page ground and copy on navy. */
+  --color-paper-50: #fdfcfa;
+  --color-paper-100: #f7f4ef;
+  --color-paper-200: #ece7de;
+  --color-paper-300: #ded7ca;
+
+  /* Copper accent. 500 sits on light, 300 sits on navy. */
+  --color-accent-700: #9a4c22;
+  --color-accent-500: #b65e2e;
+  --color-accent-300: #e4a06e;
+  --color-accent-100: #f3ddc9;
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Editorial type scale — larger jumps than the Tailwind default so display
+     headings read as headlines rather than as slightly-bigger body text. */
+  --text-display: clamp(2.5rem, 1.4rem + 4.6vw, 5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.028em;
+  --text-headline: clamp(1.95rem, 1.25rem + 2.6vw, 3.25rem);
+  --text-headline--line-height: 1.08;
+  --text-headline--letter-spacing: -0.022em;
+  --text-title: clamp(1.35rem, 1.1rem + 1vw, 1.85rem);
+  --text-title--line-height: 1.2;
+  --text-title--letter-spacing: -0.015em;
+  --text-lede: clamp(1.075rem, 1rem + 0.4vw, 1.3rem);
+  --text-lede--line-height: 1.6;
+
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper-100);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One consistent focus ring everywhere, including on dark surfaces. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .on-dark :focus-visible {
+    outline-color: var(--color-accent-300);
+  }
+
+  ::selection {
+    background-color: var(--color-accent-100);
+    color: var(--color-ink-900);
+  }
+}
+
+@layer components {
+  /* Shared page gutter. Wide enough to feel generous on desktop without
+     stranding content in the middle of an ultrawide monitor. */
+  .shell {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 78rem;
+    padding-inline: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .shell {
+      padding-inline: 3rem;
+    }
+  }
+
+  /* Small caps label used to open most sections. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent-700);
+  }
+
+  .eyebrow::before {
+    content: "";
+    inline-size: 1.75rem;
+    block-size: 1px;
+    background-color: currentColor;
+    flex: none;
+  }
+
+  .on-dark .eyebrow {
+    color: var(--color-accent-300);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Scroll reveal. The transform is applied by CSS only after the element is
+   marked visible by an IntersectionObserver, so content is never hidden if
+   JavaScript fails to run — [data-reveal] without the attribute set stays at
+   its natural position.
+--------------------------------------------------------------------------- */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+}
+
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.65s var(--ease-out-soft),
+    transform 0.65s var(--ease-out-soft);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-reveal="hidden"] {
+    opacity: 1;
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
